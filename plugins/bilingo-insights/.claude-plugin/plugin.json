@@ -1,0 +1,10 @@
+{
+  "name": "bilingo-insights",
+  "version": "1.0.0",
+  "description": "Bilingual explanatory insights. Each insight appears in English and in a second language set by INSIGHTS_LANG (default German).",
+  "author": {
+    "name": "Artem Iagovdik",
+    "email": "artyom.yagovdik@gmail.com",
+    "url": "https://github.com/artttj"
+  }
+}
