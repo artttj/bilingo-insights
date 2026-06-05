@@ -6,15 +6,15 @@
     "url": "https://github.com/artttj"
   },
   "metadata": {
-    "description": "Bilingual explanatory insights for Claude Code. English plus a language you choose.",
-    "version": "1.0.0"
+    "description": "Multilingual explanatory insights for Claude Code. One box per language you choose.",
+    "version": "2.0.0"
   },
   "plugins": [
     {
       "name": "bilingo-insights",
       "source": "./plugins/bilingo-insights",
-      "description": "Recreates the explanatory output style, but every insight appears in English and in a second language set by INSIGHTS_LANG (default German). Read insights in your mother tongue, or learn a language through the code you already read.",
-      "version": "1.0.0",
+      "description": "Recreates the explanatory output style, but each insight is rendered once per language in INSIGHTS_LANG, an ordered comma-separated list (default English then German). Read insights in your mother tongue, learn a language through the code you already read, or show them in one language only.",
+      "version": "2.0.0",
       "author": {
         "name": "Artem Iagovdik",
         "url": "https://github.com/artttj"
@@ -22,7 +22,7 @@
       "homepage": "https://github.com/artttj/bilingo-insights",
       "license": "MIT",
       "category": "productivity",
-      "keywords": ["insights", "bilingual", "i18n", "explanatory", "translation", "learning"]
+      "keywords": ["insights", "multilingual", "bilingual", "i18n", "explanatory", "translation", "learning"]
     }
   ]
 }

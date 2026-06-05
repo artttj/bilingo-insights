@@ -2,18 +2,18 @@
 
 **Date:** 2026-06-05
 **Author:** Artem Iagovdik (artyom.yagovdik@gmail.com)
-**Status:** Approved for planning
+**Status:** Implemented, updated for v2.0.0 (multilingual list)
 
 ## Summary
 
 `bilingo-insights` is a standalone Claude Code plugin. It recreates the
-explanatory output style, but every insight is shown twice: once in English,
-then the same points translated into a configured language. German is the
-default.
+explanatory output style, but each insight is rendered once per language in an
+ordered list. `INSIGHTS_LANG` holds that list (default `en,de`, English then
+German). One language gives a single box, three give three.
 
 The plugin ships nothing executable beyond a single `SessionStart` hook. The
-hook injects an instruction into the system prompt. The model writes both
-languages inline. There is no translation API and no parsing of model output.
+hook injects an instruction into the system prompt. The model writes every
+language inline. There is no translation API and no parsing of model output.
 
 ## Positioning
 
@@ -52,41 +52,47 @@ Alternatives considered and rejected:
 
 ### Language selection
 
-- Env var `INSIGHTS_LANG` picks the second language. Default: `de`.
-- Accepts a code or a name (`de`, `German`, `fr`, `français`). The value is
-  passed through to the instruction as the target language; the model handles
+- Env var `INSIGHTS_LANG` is an ordered, comma-separated list of languages.
+  Default: `en,de`. The first entry is the canonical box; the rest translate it.
+- Each entry is a code or a name (`de`, `German`, `fr`, `français`). Codes map to
+  names via a small table; unknown values pass through, and the model handles
   either form.
+- One entry gives a single box. Two or more give one box each, in list order.
 - Set it in a shell profile, or in the `env` block of Claude Code
   `settings.json`, which is more reliable across shells.
-- The hook sanitizes the value to `[A-Za-z0-9 _-]` before injecting, so a
-  malformed variable cannot break the emitted JSON. An empty result falls back
-  to `de`.
+- The hook splits on commas, trims and sanitizes each entry to `[A-Za-z0-9 _-]`,
+  drops empties, and drops repeats (case-insensitive, first wins). If nothing
+  valid survives, it falls back to `en,de`. A malformed variable cannot break
+  the emitted JSON.
 
 ### Output format
 
-Two stacked boxes per insight. The second box header is localized to the target
-language.
+One stacked box per language, in list order. Each non-English header is
+localized.
 
 ```
 ★ Insight ─────────────────────────────
-- <2-3 codebase-specific points in English>
+- <2-3 codebase-specific points in the first language>
 ────────────────────────────────────────
 ★ Einblick ────────────────────────────
 - <the same points, faithfully translated>
+────────────────────────────────────────
+★ Aperçu ──────────────────────────────
+- <the same points again, in the third language>
 ────────────────────────────────────────
 ```
 
 Rules the instruction enforces:
 
-- The translated box mirrors the same points. It does not add, drop, or invent
-  content.
-- The second header uses the word for "Insight" in the target language
-  (`Einblick` for German, `Aperçu` for French, and so on). The model supplies
-  this.
-- 2-3 points, codebase-specific, before and after writing code, the same
-  cadence as the original explanatory style.
-- If the target language resolves to English, emit a single English box. No
-  pointless duplicate.
+- The first box is the canonical insight. Every later box mirrors the same
+  points. It does not add, drop, or invent content.
+- Each box header uses the word for "Insight" in its language (`Insight`,
+  `Einblick` for German, `Aperçu` for French, and so on). The model supplies the
+  localized words.
+- 2-3 points, codebase-specific, before and after writing code, the same cadence
+  as the original explanatory style.
+- A single-language list emits one box with no translation rule. If that
+  language is English, the output matches the original explanatory style.
 
 ## Repository layout
 
@@ -104,7 +110,7 @@ bilingo-insights/
 │       ├── hooks/
 │       │   └── hooks.json         # SessionStart → session-start.sh
 │       └── hooks-handlers/
-│           └── session-start.sh   # builds and injects the bilingual instruction
+│           └── session-start.sh   # builds and injects the multilingual instruction
 ├── docs/
 │   └── superpowers/specs/         # this design doc
 ├── README.md
@@ -115,12 +121,13 @@ bilingo-insights/
 
 `session-start.sh`:
 
-1. Read `INSIGHTS_LANG`, default `de`.
-2. Sanitize to `[A-Za-z0-9 _-]`; empty → `de`.
-3. Substitute the language into a pre-escaped instruction string (placeholder
-   swap). The static instruction is stored already JSON-escaped, so only the
-   sanitized language token is interpolated. JSON stays valid with no `jq` or
-   `python` dependency.
+1. Read `INSIGHTS_LANG`, default `en,de`.
+2. Split on commas. Trim and sanitize each entry to `[A-Za-z0-9 _-]`, resolve
+   codes to names, drop empties and repeats. Empty list → `en,de`.
+3. Build the instruction. One language uses a single-box template (placeholder
+   swap for the name). Two or more build the box block in a loop, one box per
+   language. The whole string is then JSON-escaped in pure bash, so JSON stays
+   valid with no `jq` or `python` dependency.
 4. Print the `hookSpecificOutput` JSON, the same shape as the official
    `session-start.sh`:
 
@@ -141,10 +148,11 @@ insights for some users.
 
 - `marketplace.json`: name `bilingo-insights`, owner Artem Iagovdik, one plugin
   entry with `source: ./plugins/bilingo-insights`, category `productivity`,
-  keywords (insights, bilingual, i18n, explanatory, translation, learning).
-- `plugin.json`: name `bilingo-insights`, version `1.0.0`, author Artem
-  Iagovdik (artyom.yagovdik@gmail.com), description covering the bilingual
-  explanatory behavior and the `INSIGHTS_LANG` variable.
+  keywords (insights, multilingual, bilingual, i18n, explanatory, translation,
+  learning).
+- `plugin.json`: name `bilingo-insights`, version `2.0.0`, author Artem
+  Iagovdik (artyom.yagovdik@gmail.com), description covering the multilingual
+  explanatory behavior and the `INSIGHTS_LANG` list.
 
 ## README
 
@@ -153,16 +161,15 @@ insights for some users.
   learn a language through the code you already read.
 - Install via marketplace, then enable the plugin.
 - Configure `INSIGHTS_LANG` (shell profile and `settings.json` `env` examples).
-- Sample output showing the two boxes.
-- Token-cost note: this roughly doubles insight output, and the translated text
-  often runs longer than English (German especially). Same warning the official
-  plugin carries.
+- Sample output showing the stacked boxes.
+- Token-cost note: each language adds a copy of the insight, so two roughly
+  doubles output and three roughly triples it. Translated text often runs longer
+  than English (German especially). Same warning the official plugin carries.
 - Branding is the author's own. No association with any language-learning
   product.
 
 ## Out of scope
 
 - No translation API or network calls.
-- No more than two languages at once (English + one target).
-- No per-message language switching; the language is set per session via the
-  env var.
+- No per-message language switching; the language list is set per session via
+  the env var.
