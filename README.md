@@ -1,5 +1,9 @@
 # bilingo-insights
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge)](LICENSE) ![Version](https://img.shields.io/badge/version-2.0.0-success?style=for-the-badge) ![Claude Code](https://img.shields.io/badge/Claude%20Code-D97757?style=for-the-badge&logo=anthropic&logoColor=white)
+
+![bilingo-insights](assets/banner.png)
+
 Multilingual explanatory insights for Claude Code. Each insight shows up once per
 language you pick, stacked. By default you get English then German.
 
@@ -24,26 +28,26 @@ The rest of this page is detail you only need if you want it.
 
 ## What it looks like
 
-Say Claude just added a database index while working on your task. With the
-default `en,de`, the insight arrives as two stacked boxes, the same points in
-each language:
+Say an insight about floating-point math comes up while Claude works on your
+task. With the default `en,de`, it arrives as two stacked boxes, the same points
+in each language:
 
 ```
 ★ Insight ──────────────────────────────────────────────────
-- The index on orders(customer_id, created_at) turns the dashboard's full
-  table scan into a range scan. That's the real speedup.
-- Column order matters. It covers `WHERE customer_id = ? ORDER BY created_at`,
-  but does nothing for a query that filters on created_at alone.
-- An index is not free. Every insert into orders now updates it too, so add one
-  because a query needs it, not out of habit.
+- 0.1 + 0.2 isn't 0.3 in most languages. You get 0.30000000000000004,
+  because floats store decimal fractions as binary approximations.
+- So comparing two floats with == is a trap. Check that the difference is
+  smaller than a tiny epsilon instead.
+- It also means order matters when you add many small floats. Sum them in a
+  different order and the total can come out slightly different.
 ──────────────────────────────────────────────────────────────
 ★ Einblick ─────────────────────────────────────────────────
-- Der Index auf orders(customer_id, created_at) macht aus dem vollen
-  Tabellenscan des Dashboards einen Range-Scan. Das ist der eigentliche Gewinn.
-- Die Spaltenreihenfolge zählt. Er deckt `WHERE customer_id = ? ORDER BY
-  created_at` ab, bringt aber nichts für einen Filter nur auf created_at.
-- Ein Index ist nicht umsonst. Jedes Insert in orders aktualisiert ihn jetzt
-  mit, also leg ihn an, weil eine Abfrage ihn braucht, nicht aus Gewohnheit.
+- 0.1 + 0.2 ist in den meisten Sprachen nicht 0.3. Du bekommst
+  0.30000000000000004, weil Floats Dezimalbrüche als binäre Näherung speichern.
+- Zwei Floats mit == zu vergleichen ist deshalb eine Falle. Prüfe stattdessen,
+  ob die Differenz kleiner als ein winziges Epsilon ist.
+- Auch die Reihenfolge zählt, wenn du viele kleine Floats addierst. In anderer
+  Reihenfolge kommt ein leicht anderes Ergebnis heraus.
 ──────────────────────────────────────────────────────────────
 ```
 

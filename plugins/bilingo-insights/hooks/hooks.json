@@ -1,5 +1,5 @@
 {
-  "description": "Bilingual explanatory insights hook. Adds English plus chosen-language insight instructions.",
+  "description": "Multilingual explanatory insights hook. Adds insight instructions in the languages set by INSIGHTS_LANG.",
   "hooks": {
     "SessionStart": [
       {

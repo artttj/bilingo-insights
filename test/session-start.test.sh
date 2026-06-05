@@ -60,12 +60,24 @@ check "duplicates: collapse to single box" "$(has "$out" 'Write each insight in'
 check "duplicates: targets German" "$(has "$out" 'in German')"
 check "duplicates: no translation box" "$(lacks "$out" 'translated into')"
 
+out="$(INSIGHTS_LANG='en,eng,english' bash "$HOOK")"
+printf '%s' "$out" | valid_json && j=1 || j=0
+check "alias dedup: valid JSON" "$j"
+check "alias dedup: single English box" "$(has "$out" '★ Insight')"
+check "alias dedup: no translation box" "$(lacks "$out" 'translated into')"
+
+out="$(INSIGHTS_LANG=Klingon bash "$HOOK")"
+printf '%s' "$out" | valid_json && j=1 || j=0
+check "unknown lang: valid JSON" "$j"
+check "unknown lang: targets the name" "$(has "$out" 'in Klingon')"
+
 out="$(INSIGHTS_LANG='' bash "$HOOK")"
 check "empty: falls back to English, German" "$(has "$out" 'in order: English, German')"
 
 out="$(INSIGHTS_LANG='de"; rm -rf /' bash "$HOOK")"
 printf '%s' "$out" | valid_json && j=1 || j=0
 check "injection: stays valid JSON" "$j"
+check "injection: metacharacters stripped to inert token" "$(has "$out" 'in de rm -rf')"
 
 out="$(INSIGHTS_LANG=en bash "$HOOK")"
 printf '%s' "$out" | valid_json && j=1 || j=0
