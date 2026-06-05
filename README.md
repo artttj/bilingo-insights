@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge)](LICENSE) ![Version](https://img.shields.io/badge/version-2.0.0-success?style=for-the-badge) ![Claude Code](https://img.shields.io/badge/Claude%20Code-D97757?style=for-the-badge&logo=anthropic&logoColor=white)
 
-![bilingo-insights](assets/banner.png)
+<!-- ![bilingo-insights](assets/banner.png) -->
 
 Multilingual explanatory insights for Claude Code. Each insight shows up once per
 language you pick, stacked. By default you get English then German.
