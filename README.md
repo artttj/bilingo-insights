@@ -57,14 +57,14 @@ same points, no English in the way. Want a third language? `en,de,fr` stacks an
 
 ## Why you might want it
 
+- Learn a language while you code. Point it at one you are learning. You already
+  read code for hours, so now every insight comes with its translation and you
+  pick up real technical vocabulary in context.
 - Your Claude Code is in English but you think in another language. Set
   `INSIGHTS_LANG` to your language alone and the point lands in your head faster,
   with no English box you don't need.
 - Read insights in your mother tongue while keeping the English. Use `en,xx` and
   the idea sits right next to the English the rest of the field uses.
-- Learn a language while you code. Point it at one you are learning. You already
-  read code for hours, so now every insight comes with its translation and you
-  pick up real technical vocabulary in context.
 
 ## How it works
 
